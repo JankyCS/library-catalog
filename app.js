@@ -9,14 +9,28 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+//MongoDB, Mongoose Stuff
+//Default connection to database
+var mongoose = require('mongoose');
+var mongoDB =//ommitted database URL
+mongoose.connect(mongoDB, {useNewUrlParser: true});
+var db = mongoose.connection;
+//Binds error event (errors print to console)
+db.on('error', console.error.bind(console,'MongoDB Connection Error:'))
+
 // view engine setup
+//first specify folder where templates are stored
 app.set('views', path.join(__dirname, 'views'));
+//Use template library pug
 app.set('view engine', 'pug');
 
+//Setting up middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+//Serve static files in public directory (idk what that means)
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
