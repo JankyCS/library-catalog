@@ -1,10 +1,18 @@
 var Author =require('../models/author');
 
 //display author list
-module.exports.author_list = function(req, res)
-{
-    res.send("to be implemented");
-}
+// Display list of all Authors.
+module.exports.author_list = function(req, res, next) {
+
+  Author.find()
+    .sort([['last_name', 'ascending']])
+    .exec(function (err, list_authors) {
+      if (err) { return next(err); }
+      //Successful, so render
+      res.render('author_list', { title: 'Author List', author_list: list_authors });
+    });
+
+};
 
 //Display detail page for specific author
 

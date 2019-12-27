@@ -12,14 +12,14 @@ router.get('/', book_controller.index);
 
 
 
-//Attempt at condensing the routes into mroe generalized statements -- to be continued 
+//(Failed) Attempt at condensing the routes into mroe generalized statements -- difficult to dynamically call functions because window cannot be used
 /*
 router.get('/:object/create', function(req,res)
 {
     var object = req.params.object;
     var method = req.params.method;
 
-    if(object!=="book" && object!=="author" && object!=="genre" &&) object!=="bookinstance")
+    if(object!=="book" && object!=="author" && object!=="genre" && object!=="bookinstance")
     {
       res.render('error');
     }
@@ -35,13 +35,14 @@ router.post('/:object/create', function(req,res)
     var object = req.params.object;
     var method = req.params.method;
 
-    if(object!=="book" && object!=="author" && object!=="genre" &&) object!=="bookinstance")
+    if(object!=="book" && object!=="author" && object!=="genre" && object!=="bookinstance")
     {
       res.render('error');
     }
     else
     {
-      window[object+"_controller."+object+"_create_post"]();
+     // window[object+"_controller."+object+"_create_post"]();
+      window["book_controller.book_create_post"]();
     }
 }
 );
