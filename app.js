@@ -12,7 +12,7 @@ var app = express();
 //MongoDB, Mongoose Stuff
 //Default connection to database
 var mongoose = require('mongoose');
-var mongoDB =//ommitted database URL
+var mongoDB ='mongodb+srv://JankyCS:Fpzt1385629%21@jankycluster1-y44sa.mongodb.net/library-catalog?retryWrites=true&w=majority'
 mongoose.connect(mongoDB, {useNewUrlParser: true});
 var db = mongoose.connection;
 //Binds error event (errors print to console)
