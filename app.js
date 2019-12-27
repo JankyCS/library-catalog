@@ -6,13 +6,16 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var catalogRouter = require('./routes/catalog'); //importing catalog route
 
 var app = express();
 
 //MongoDB, Mongoose Stuff
 //Default connection to database
 var mongoose = require('mongoose');
-var mongoDB ='mongodb+srv://JankyCS:Fpzt1385629%21@jankycluster1-y44sa.mongodb.net/library-catalog?retryWrites=true&w=majority'
+var mongoDB ='mongodb+srv://JankyCS:MKlgWwkaGaqf8kFm@jankycluster1-y44sa.mongodb.net/test?retryWrites=true&w=majority'
+
+
 mongoose.connect(mongoDB, {useNewUrlParser: true});
 var db = mongoose.connection;
 //Binds error event (errors print to console)
@@ -35,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/catalog',catalogRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

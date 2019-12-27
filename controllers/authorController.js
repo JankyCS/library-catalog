@@ -33,12 +33,12 @@ module.exports.author_delete_post = function(req,res)
     res.send("TBI: author delete POST");
 }
 
-author_update_get = function(req, res)
+module.exports.author_update_get = function(req, res)
 {
     res.send("TBI: Author update GET");
 }
 
-author_update_post = function(req, res)
+module.exports.author_update_post = function(req, res)
 {
     res.send("TBI: Author update POST");
 }
