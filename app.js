@@ -13,7 +13,7 @@ var app = express();
 //MongoDB, Mongoose Stuff
 //Default connection to database
 var mongoose = require('mongoose');
-var mongoDB =
+var mongoDB = 'mongodb+srv://JankyCS:password@jankycluster1-y44sa.mongodb.net/test?retryWrites=true&w=majority'
 
 
 mongoose.connect(mongoDB, {useNewUrlParser: true});

@@ -44,14 +44,14 @@ AuthorSchema
 .get(function () {
 
     //ternary function, if date of brith doesnt exist do not format. Instead return empty string
-    return this.date_of_birth ? moment(this.date_of_birth).format('YYYY-MMMM-DD') : '';
+    return this.date_of_birth ? moment(this.date_of_birth).format('MMMM Do, YYYY') : '';
 });
 
 AuthorSchema
 .virtual('deathDateFormatted')
 .get(function () {
     //ternary function, if date of brith doesnt exist do not format. Instead return empty string
-    return this.date_of_death ? moment(this.date_of_death).format('YYYY-MMMM-DD') : '';
+    return this.date_of_death ? moment(this.date_of_death).format('MMMM Do, YYYY') : '';
 });
 
 module.exports = mongoose.model('Author', AuthorSchema);
