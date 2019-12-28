@@ -1,0 +1,22 @@
+extend layout
+
+block content
+    h1= title
+    if instances.length
+        p Cannot delete book until these instances are deleted:
+        ul
+            each val in instances
+                li
+                    a(href=val.url) #{val._id}
+    else
+        p Really want to delete?
+        p title: #{book.title}
+        p id: #{book._id}
+        p author:
+            a(href=book.author.url) #{book.author.first_name} #{book.author.last_name}
+        p Genre: 
+            each genre in book.genre
+                |#{genre.name}
+        form(method='POST' action='')
+             input#bookid.form-control(type='hidden',name='bookid', required='true', value=book._id )
+             button.btn.btn-primary(type='submit') Delete

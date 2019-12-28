@@ -16,7 +16,7 @@ var BookSchema = new Schema(
         isbn: {type: String, required: true},
 
         //Array of Genres
-        genre: [{type: Schema.Types.ObjectId,ref:'Genre'}]
+       genre: [{ type: Schema.Types.ObjectId, ref: 'Genre' }]
     }
 );
 

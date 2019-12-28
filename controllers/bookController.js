@@ -3,6 +3,9 @@ var Author = require('../models/author');
 var Genre = require('../models/genre');
 var BookInstance = require('../models/bookinstance');
 
+const { body,validationResult } = require('express-validator/check');
+const { sanitizeBody } = require('express-validator/filter');
+
 var async = require('async');
 
 exports.index = function(req, res) {   
@@ -74,23 +77,173 @@ exports.book_detail = function(req, res, next) {
 
 
 // Display book create form on GET.
-exports.book_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create GET');
+exports.book_create_get = function(req, res, next) { 
+      
+    // Get all authors and genres, which we can use for adding to our book.
+    async.parallel({
+        authors: function(callback) {
+            Author.find(callback);
+        },
+        genres: function(callback) {
+            Genre.find(callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        res.render('book_form', { title: 'Create Book', authors: results.authors, genres: results.genres });
+    });
+    
 };
 
 // Handle book create on POST.
-exports.book_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create POST');
-};
+exports.book_create_post = [
+    // Convert the genre to an array.
+    (req, res, next) => {
+       // console.log("4");
+        if(!(req.body.genre instanceof Array))
+        {
+            console.log("1");
+            if(typeof req.body.genre==='undefined')
+            {console.log("6");
+                req.body.genre=new Array(0);
+                console.log(req.body.genre);
+            }
+            else
+            {
+            //console.log("3");
+            req.body.genre=new Array(req.body.genre);
+            }
+        }
+       // console.log(req.body.genre instanceof Array);
+        //req.body.genre=[];
+        next();
+    },
+
+    // Validate fields.
+    body('title', 'Title must not be empty.').isLength({ min: 1 }).trim(),
+    body('author', 'Author must not be empty.').isLength({ min: 1 }).trim(),
+    body('summary', 'Summary must not be empty.').isLength({ min: 1 }).trim(),
+    body('isbn', 'ISBN must not be empty').isLength({ min: 1 }).trim(),
+  
+    // Sanitize fields (using wildcard).
+    sanitizeBody('*').escape(),
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+        
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+    console.log('9')
+        // Create a Book object with escaped and trimmed data.
+        var book = new Book(
+          { title: req.body.title,
+            author: req.body.author,
+            summary: req.body.summary,
+            isbn: req.body.isbn,
+            genre: req.body.genre
+           });
+console.log('8')
+ console.log(errors);
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+
+            // Get all authors and genres for form.
+             
+            async.parallel({
+                authors: function(callback) {
+                    Author.find(callback);
+                },
+                genres: function(callback) {
+                   
+                    Genre.find(callback);
+                },
+            }, function(err, results) {
+                if (err) { return next(err); }
+
+                // Mark our selected genres as checked.
+                for (let i = 0; i < results.genres.length; i++) {
+                    if (book.genre.indexOf(results.genres[i]._id) > -1) {
+                        results.genres[i].checked='true';
+                    }
+                }
+                res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array() });
+            });
+            return;
+        }
+        else {
+            // Data from form is valid. Save book.
+            book.save(function (err) {
+                if (err) { return next(err); }
+                   //successful - redirect to new book record.
+                   res.redirect(book.url);
+                });
+        }
+    }
+];
 
 // Display book delete form on GET.
 exports.book_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete GET');
+    async.parallel(
+
+    {
+        theBook: function(callback)
+        {
+            Book.findById(req.params.id).populate('author').populate('genre').exec(callback);
+        },
+        bookInstances: function(callback)
+        {
+            BookInstance.find({'book': req.params.id}).exec(callback);
+        }
+    },
+    function(err, result)
+    {
+        if(err){return next(err);}
+        else
+        {
+            res.render('book_delete',{title:"Delete Book",book:result.theBook, instances:result.bookInstances});
+        }
+    }
+    );
 };
 
 // Handle book delete on POST.
 exports.book_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete POST');
+    async.parallel(
+
+    {
+        theBook: function(callback)
+        {
+            Book.findById(req.body.bookid).populate('author').populate('genre').exec(callback);
+        },
+        bookInstances: function(callback)
+        {
+            BookInstance.find({'book': req.body.bookid}).exec(callback);
+        }
+    },
+    function(err, result)
+    {
+        if(err){return next(err);}
+        else
+        {
+            if(result.bookInstances.length>0)
+            {
+                console.log(result.bookInstances);
+                res.render('book_delete',{title:"Delete Book",book:result.theBook, instances:result.bookInstances});
+            }
+            else
+            {
+                Book.findByIdAndRemove(result.theBook._id,function(err,next)
+                {
+                    if(err){return next(err);}
+                    else
+                    {
+                    res.redirect('/catalog/books');
+                    }
+                }
+                );
+            }
+        }
+    }
+    );
 };
 
 // Display book update form on GET.
